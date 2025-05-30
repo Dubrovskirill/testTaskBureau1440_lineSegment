@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <algorithm>
+#include <fstream>
 
 //идея оптимизации
 //отсортировать все отрезки по праву концу
@@ -48,19 +49,27 @@ int findMinPoints(std::vector<Segment>& segments) {
 }
 
 int main() {
+	
+	std::ifstream file("data_prog_contest_problem_1.txt");
+	if (!file.is_open()) {
+		std::cout << "File opening error" << std::endl;
+		return 1;
+	}
+	
 	int n;
-	std::cout << "Enter the number of segments:";
-	std::cin >> n;
+	file >> n; 
 	
 	std::vector<Segment> segments;
 	for (int i = 0; i < n; ++i) {
 		double start, end;
-		std::cin >> start >> end;
+		file >> start >> end;
 		segments.emplace_back(start, end);
 	}
 	
+	file.close(); 
+	
 	int result = findMinPoints(segments);
-	std::cout << "Minimum number of points:" << result << std::endl;
+	std::cout << "Minimum number of points: " << result << std::endl;
 	
 	return 0;
 }
