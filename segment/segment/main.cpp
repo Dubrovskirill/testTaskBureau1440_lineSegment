@@ -2,6 +2,12 @@
 #include <vector>
 #include <algorithm>
 
+//идея оптимизации
+//отсортировать все отрезки по праву концу
+//Берем правый конец первого отрезка как первую точку
+//gропускаем все отрезки, которые содержат эту точку
+//gовторяем для оставшихся отрезков
+
 //структура для храния координат отрезка
 struct Segment {
 	double start, end;
@@ -10,6 +16,10 @@ struct Segment {
 		: start(start), end(end) {}
 };
 
+// Функция сравнения для сортировки отрезков
+bool compareSegments(const Segment& a, const Segment& b) {
+	return a.end < b.end;
+}
 
 //два отрезка не пересекаются, если конец одного меньше начала другого
 //иначе они пересекаются
@@ -17,29 +27,19 @@ bool doSegmentsIntersect(const Segment& s1, const Segment& s2) {
 	return !(s1.end < s2.start || s2.end < s1.start);
 }
 
-// Находит минимальное количество точек для покрытия всех отрезков
-int findMinPoints(const std::vector<Segment>& segments) {
+//находит минимальное количество точек для покрытия всех отрезков
+int findMinPoints(std::vector<Segment>& segments) {
 	if (segments.empty()) return 0;
 	
-	std::vector<bool> used(segments.size(), false);
-	int points = 0;
+	std::sort(segments.begin(), segments.end(), compareSegments);
 	
-	for (size_t i = 0; i < segments.size(); ++i) {
-		// Если отрезок еще не обработан
-		if (!used[i]) {
-			// Находим все отрезки, которые пересекаются с текущим
-			std::vector<size_t> intersecting;
-			for (size_t j = i; j < segments.size(); ++j) {
-				if (!used[j] && doSegmentsIntersect(segments[i], segments[j])) {
-					intersecting.push_back(j);
-				}
-			}
-			
-			// Помечаем все пересекающиеся отрезки как использованные
-			for (size_t idx : intersecting) {
-				used[idx] = true;
-			}
-			
+	int points = 0;
+	double lastPoint = segments[0].end; 
+	points++;
+	
+	for (size_t i = 1; i < segments.size(); ++i) {
+		if (segments[i].start > lastPoint) {
+			lastPoint = segments[i].end; 
 			points++;
 		}
 	}
